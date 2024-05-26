@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true) // Solo compara por le ID
-@Document(collection = "menus")
+@Document(collection = "invoices")
 public class Invoice {
 
     @Id
