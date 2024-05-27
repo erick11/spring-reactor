@@ -45,6 +45,12 @@
 			<optional>true</optional>
 		</dependency>
 
+        <!--Necesario desde la Spring Boot 2.3-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
         <!--Para que settiar los valores en la capa DTO -->
 		<dependency>
 			<groupId>org.modelmapper</groupId>

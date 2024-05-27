@@ -3,6 +3,7 @@ package com.mitocode.controller;
 import com.mitocode.dto.DishDTO;
 import com.mitocode.model.Dish;
 import com.mitocode.service.IDishService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
@@ -69,7 +70,7 @@ public class DishController {
 
 
     @PostMapping
-    public Mono<ResponseEntity<DishDTO>> save (@RequestBody DishDTO dto, final ServerHttpRequest req){
+    public Mono<ResponseEntity<DishDTO>> save (@Valid @RequestBody DishDTO dto, final ServerHttpRequest req){
         return service.save( converToDocument(dto))
                 .map(this::converToDTO)
                 .map(e -> ResponseEntity.created(
@@ -81,7 +82,7 @@ public class DishController {
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<DishDTO>> update (@PathVariable("id") String id, @RequestBody DishDTO dto){
+    public Mono<ResponseEntity<DishDTO>> update (@Valid @PathVariable("id") String id, @RequestBody DishDTO dto){
         return Mono.just(dto)
                 .map(e -> {
                     e.setId(id);
