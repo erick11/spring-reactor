@@ -1,13 +1,12 @@
 package com.mitocode.controller;
 
-import com.mitocode.dto.DishDTO;
-import com.mitocode.model.Dish;
+import com.mitocode.dto.InvoiceDTO;
+import com.mitocode.model.Invoice;
 import com.mitocode.pagination.PageSupport;
-import com.mitocode.service.IDishService;
+import com.mitocode.service.IInvoiceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.EntityModel;
@@ -20,27 +19,26 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.util.function.Function;
 
 import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.methodOn;
 
 
 @RestController
-@RequestMapping("/dishes")
+@RequestMapping("/invoices")
 @RequiredArgsConstructor // Hace la inyeccion por constructor, pero solo toma en cuenta los que tienen "final"
-public class DishController {
+public class InvoiceController {
 
-    private final IDishService service;
+    private final IInvoiceService service;
 
-    @Qualifier("defaultMapper")
+    @Qualifier("invoiceMapper")
     private final ModelMapper modelMapper;
 
     @GetMapping
-    public Mono<ResponseEntity<Flux<DishDTO>>> findAll() {
+    public Mono<ResponseEntity<Flux<InvoiceDTO>>> findAll() {
         // .map: pide como parametro una interface funcional Function
-        // Function: T parametro de entrada y R es el resultado => e -> modelMapper.map(e, DishDTO.class)
-        Flux<DishDTO> fx = service.findAll().map(this::converToDTO);
+        // Function: T parametro de entrada y R es el resultado => e -> modelMapper.map(e, InvoiceDTO.class)
+        Flux<InvoiceDTO> fx = service.findAll().map(this::converToDTO);
         return Mono.just(ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(fx)
@@ -48,7 +46,7 @@ public class DishController {
     }
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<DishDTO>> finById(@PathVariable("id") String id) {
+    public Mono<ResponseEntity<InvoiceDTO>> finById(@PathVariable("id") String id) {
 
         return service.findById(id)
                 .map(this::converToDTO)
@@ -57,7 +55,7 @@ public class DishController {
                         .contentType(MediaType.APPLICATION_JSON)
                         //Contenido en el body.
                         //El body es lo que esta dentro de los parentesis angulares de ResponseEntity
-                        //Por ello, el metodo body solo te pide como parametro un objeto de Dish
+                        //Por ello, el metodo body solo te pide como parametro un objeto de Invoice
                         .body(e)
                 )
                 //Si por alguna razon no se encuentra informacion devuelvo notFound()
@@ -65,7 +63,7 @@ public class DishController {
     }
 
     @GetMapping("/v2/{id}")
-    public Mono<ResponseEntity<Mono<Dish>>> finByIdV2(@PathVariable("id") String id) {
+    public Mono<ResponseEntity<Mono<Invoice>>> finByIdV2(@PathVariable("id") String id) {
         return service.findById(id)
                 //Tranformar la salida anterior a un ResponseEntity
                 .map(e -> ResponseEntity.ok()
@@ -81,7 +79,7 @@ public class DishController {
 
 
     @PostMapping
-    public Mono<ResponseEntity<DishDTO>> save(@Valid @RequestBody DishDTO dto, final ServerHttpRequest req) {
+    public Mono<ResponseEntity<InvoiceDTO>> save(@Valid @RequestBody InvoiceDTO dto, final ServerHttpRequest req) {
         return service.save(converToDocument(dto))
                 .map(this::converToDTO)
                 .map(e -> ResponseEntity.created(
@@ -93,7 +91,7 @@ public class DishController {
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<DishDTO>> update(@Valid @PathVariable("id") String id, @RequestBody DishDTO dto) {
+    public Mono<ResponseEntity<InvoiceDTO>> update(@Valid @PathVariable("id") String id, @RequestBody InvoiceDTO dto) {
         return Mono.just(dto)
                 .map(e -> {
                     e.setId(id);
@@ -120,20 +118,20 @@ public class DishController {
                 });
     }
 
-    private DishDTO dishHateoas;
+    private InvoiceDTO invoiceHateoas;
     @GetMapping("/hateoas/{id}")
-    public Mono<EntityModel<DishDTO>> getHateoas (@PathVariable ("id") String id) {
-        Mono <Link> monoLink =  linkTo(methodOn(DishController.class).finById(id)).withRel("dish-info").toMono();
+    public Mono<EntityModel<InvoiceDTO>> getHateoas (@PathVariable ("id") String id) {
+        Mono <Link> monoLink =  linkTo(methodOn(InvoiceController.class).finById(id)).withRel("invoice-info").toMono();
 
         //PRACTICA ES COMUN PERO NO RECOMENADA
         /*
         return service.findById(id)
                 .map(this::converToDTO)
                 .flatMap(d -> {
-                    this.dishHateoas = d;
+                    this.invoiceHateoas = d;
                     return monoLink;
                 })
-                .map(link -> EntityModel.of(this.dishHateoas,link));
+                .map(link -> EntityModel.of(this.invoiceHateoas,link));
          */
 
         //PRACTICA INTERMEDIA
@@ -151,7 +149,7 @@ public class DishController {
     }
 
     @GetMapping("/pageable")
-    private Mono<ResponseEntity<PageSupport<DishDTO>>> getPage(
+    private Mono<ResponseEntity<PageSupport<InvoiceDTO>>> getPage(
             @RequestParam (name =  "page", defaultValue = "0") int page,
             @RequestParam (name =  "size", defaultValue = "2") int size
     ){
@@ -169,11 +167,11 @@ public class DishController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    private DishDTO converToDTO (Dish model){
-        return  modelMapper.map(model, DishDTO.class);
+    private InvoiceDTO converToDTO (Invoice model){
+        return  modelMapper.map(model, InvoiceDTO.class);
     }
 
-    private Dish converToDocument (DishDTO dto){
-        return modelMapper.map(dto, Dish.class);
+    private Invoice converToDocument (InvoiceDTO dto){
+        return modelMapper.map(dto, Invoice.class);
     }
 }
