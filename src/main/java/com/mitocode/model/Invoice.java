@@ -29,6 +29,6 @@ public class Invoice {
 
 
     @Field
-    private List<InvoiceDetail> roles;
+    private List<InvoiceDetail> items;
 
 }
