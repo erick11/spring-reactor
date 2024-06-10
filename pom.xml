@@ -58,6 +58,13 @@
 			<version>3.2.0</version>
 		</dependency>
 
+		<!--Spring Hateoas tanto para mvc y reactivo-->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-hateoas</artifactId>
+			<version>1.8.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
